@@ -1,0 +1,112 @@
+---
+title: 'Some notes on gradient descent'
+subtitle: "May 13, 2020"
+author: "Robert Settlage"
+authorbox: false
+slug: "gradient descent"
+date: 2020-05-12
+publishdate: 2020-05-12
+draft: false
+mathjax: true 
+categories:
+- Optimization
+tags:
+- Deep Learning
+- optimization
+- gradient descent
+output:
+  ioslides_presentation:
+    fig_caption: yes
+    fig_height: 6
+    fig_width: 4
+    smaller: yes
+  slidy_presentation: default
+header-includes: \setlength\parindent{24pt} \usepackage{MnSymbol} \usepackage{mathrsfs}
+---
+
+## Gradient Descent
+
+Gradient descent forms the basis for many algorithms including those found in AI, machine learning and deep learning.  The basic idea is that one can optimize the solutions to a system of equations by iteratively stepping in the direction of the gradient.  Actually, negative gradient.  
+
+OK, so there is a bunch in that sentence.  First, what system of equations, are we performing some sort of regression, using neural nets or some other oddly named algorith?  Generally speaking, what I am interested in are problems of finding features in a dataset that explain the data.  What this means is that I am combining these features in some way (linear combination, non-linear, etc) and looking for parameters (weights) for these various features that give some reasonable guess for other observed features of the data.  In the simplest case, this might be, given an input x, where should I look for y?
+
+After defining a structure for how I would like to combine data features, I need to look at what a meaningful measure of how well our model explains the data.  In STATS 101, we generally talk about mean square error (MSE), or $L_2$ loss, as a reasonable way to measure our model's performance.  In machine learning labs, this is more commonly refered to as the cost function often denoted J($\Theta$).  There are other measures that may be more appropriate for the problem at hand, e.g. $L_1$ loss, mean average deviation (MAD), etc.  In other words, choosing a measure of performance is a "parameter" (more precisely, a hyperparameter) of the model.  And, in fact, this choice is often the difference between making a good or bad model.
+
+{{% alert note %}}
+Generally, quantities learned through exposure to data are termed parameters.  Hyperparameters are algorithmic settings.  For instance: learning rate, stopping rule tolerance, number of iterations to run, etc.
+{{% /alert %}}
+
+Given some structure to how we combine features and how we measure our error, we are now equipped to proceed to the actual gradient descent algorith.  To make this more concrete, suppose we are interested in a system best described through a linear model:
+
+\begin{equation}
+   h_0(x) = \theta_0 + \theta_1x 
+\end{equation}
+
+and we are using $L_2$, or MSE given by:
+
+\begin{equation}
+MSE = \frac{1}{N}\sum_n^N (h_0(x_n) - y_n)^2.
+\end{equation}
+
+The parameters we need to learn are represented by $\Theta$.  Gradient descent allows us to iteratively "learn" $\Theta$ by providing an initial guess for $\Theta$ and then updating the guess through the gradient of the loss calculated using the data.  One could liken this to experiencial learning: try something, figure out how to do better, try again, repeat.  Combining our hypotheses ($h_0$) and loss function, this algorithm becomes:
+
+while $$abs(\theta_0^{i}-\theta_0^{i-1}) \text{ AND } abs(\theta_1^{i}-\theta_1^{i-1}) > tolerance$$
+  do update:
+    \begin{eqnarray}
+        \theta_0^i &=& \theta_0^{i-1} - \alpha\frac{2}{N}\sum_{n=1}^{N} (h_0(x_n) -y_n)  \\
+        \theta_1^i &=& \theta_1^{i-1} - \alpha\frac{2}{N}\sum_{n=1}^{N} ((h_0(x_n) -y_n)x_n) 
+    \end{eqnarray}
+end while
+
+Note that the second term in the update functions is essentially moving in the direction of the gradient.  You can check this by taking partial derivatives with respect to $\theta_j$ where $j=0$ simplifies to the above when it corresponds to the intercept.  The $\alpha$ term is introduced as a tunable called the learning rate.  This is a number $[0,1]$ dampening the slide down the slope of the gradient.  Note that $\theta_j$ is a simultenous update, i.e. $\theta$ is hidden in $h_0$, we will use the values from the previous iteration such that the values of $\theta_j$ are updated simulteneously.
+
+Armed with an algorithm, we are ready to try it out.  We will use data given by $\mathbf{X}$ and $\vec{y}$ below, let's implement the algorithm and compare the results with lm($\vec{y}$~0+$\mathbf{X}$).  State the tolerance used and the step size, $\alpha$.
+
+```{r eval=T, echo=T, include=T}
+    set.seed(12567) 
+    N <- 100                                       # 100 data points
+    true_theta <- as.matrix(c(1,2),nrow=2)         # lets use intercept 1 and slope 2
+    X <- matrix(cbind(1,rep(1:10,each=10)),ncol=2) # 10 samples at each setting of X
+    y <- X%*%true_theta+rnorm(N,0,0.2)             # add some noise
+```
+
+Solution:
+
+To solve this, we need to specify an $\alpha$ and stopping rule.  I am going to use $\alpha=0.01$ and $tolerance=0.000001$.  We also need an initial guess and because we need to protect against endless loops, a maximum iteration value (10000).  I am going to start at the origin, ie $\Theta_j^0=0$
+
+```{r eval=T, echo=T, include=T}
+  ## set tunables
+  alpha <- 0.01                           # learning rate
+  tolerance <- 1e-6                       # stopping rule
+  maxit <- 10000                          # max times we iterate
+  theta <- matrix(-200,nrow=maxit,ncol=2) # saving iterations so we can plot trajectory
+  theta[1,] <- c(0,0)                     # this is inital guess, ie origin
+  i <- 2
+  theta[i,1] <- theta[i-1,1] - alpha*2/N*sum(X %*% matrix(theta[i-1,])-y)
+  theta[i,2] <- theta[i-1,2] - alpha*2/N*sum(t(X %*% matrix(theta[i-1,])-y) %*% X)
+  while(abs(theta[i,]-theta[i-1,])>tolerance && i<maxit) {
+    i <- i+1
+    theta[i,1] <- theta[i-1,1] - alpha*2/N*sum(X %*% matrix(theta[i-1,])-y)
+    theta[i,2] <- theta[i-1,2] - alpha*2/N*sum(t(X %*% matrix(theta[i-1,])-y) %*% X)
+  }
+  theta <- theta[1:i,]                    # trim the results container
+  knitr::kable(theta[c(1:5,(i-5):i),],caption="first and last 5 iterations",col.names = c("theta1","theta2"))
+```
+
+OK, the code isn't too bad with a little matrix math in there.  How well did it converge and does it compare to *lm*?  For reference, the code took `r i` iterations.
+
+```{r eval=T, echo=F, include=T}
+  results <- rbind(c(true_theta),lm(y~0+X)$coefficients,theta[i,])
+  rownames(results) <- c("true","lm","gradient descent")
+  colnames(results) <- c("theta1","theta2")
+  knitr::kable(results,caption = "Comparing true theta to lm and gradient descent results")
+
+```
+
+Gradient descent is not an exact solver and has several problems including:
+
++ no/slow convergence
++ multimodel solutions
++ sensitivity to hyperparameters: start value, learning rate, tolerance
+
+But, it is a fun algorithm to implement and watch.  There are a lot of ways to tweak and possibly improve the algorithm.  For instance, you may want to dampen the learning rate as the algorithm starts to converge.  You might simply want to try a few different starting values.  We could have used the values from the linear model to start.  I will explore some of these in future posts and expand this to more complex non-linear examples as I get a chance.

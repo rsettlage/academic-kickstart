@@ -1,0 +1,77 @@
+---
+title: Dealing with sensitivity and specificity
+author: ''
+date: '2020-05-13'
+slug: dealing-with-sensitivity-and-specificity
+categories: []
+tags: []
+subtitle: ''
+summary: ''
+authors: []
+lastmod: '2020-05-13T13:17:52-04:00'
+featured: no
+draft: false
+mathjax: true
+image:
+  caption: ''
+  focal_point: ''
+  preview_only: no
+projects: []
+---
+
+OK, me too.  Time to get though the Bayes' rule to a useful result.
+
+We hear about tests for COVID-19 and how good they are.  The numbers spouted are sensitivity and specificity.  Sensitivity is the metric for obtaining a positive test result in a positive sample, ie a true positive.  Specificity is just the opposite, a negative test result in a negative sample.  So, 100% and 99% sensitivity and specificity means dead-on, right?  Well, not quite.  There is something called Bayes' Rule that plays havoc with our mind and gets us to more meaninful numbers.  The question is simple: I took the test and got a positive/negative result, what is the probability I have/don't have the disease.  To figure this out, we need to work through the math.
+
+Bayes' Rule:  
+
+\begin{eqnarray}
+  p(a|b) * p(b) &=& p(b|a) * p(a)   \text{ or rearranged}\\\\
+  p(a|b) &=& \frac{p(b|a) p(a)}{p(b)}
+\end{eqnarray}
+
+
+Wait, why do we need all these conditional probabilities?  The reason is that we are asking conditional questions: 
+
++ given a positive test, what is the probability I am actaully positive?
++ given a positive test, what is the probability I am actaully negative?
++ given a negative test, what is the probability I am actaully negative?
++ given a negative test, what is the probability I am actaully positive?
+
+To answer these questions, we need to gather all the facts...focusing on the first question, let:
+
+1. p(a) = p(disease) = 0.2
+2. p(b) = p(positive test) = p(positive test | disease)\* p(disease) + p(positive test | no disease)\* p(no disease) = 1\* 0.2 + 0.01\* 0.8
+3. p(a|b) = p(disease | positive test) = what we want to know
+4. p(b|a) = p(positive test | disease) = true positive = 1
+
+
+OK, so this let's us compute p(disease | positive test) = $\frac{p(b|a) p(a)}{p(b)}$ = `r (1*0.2)/(1*0.2+0.1*0.8)`.
+
+The second question, p(no disease | positive test) = 1 - p(disease | positive test) = 1 - p(have disease | positive test) = 0.29
+
+The third question is (filling in knowns as we find them):
+\begin{eqnarray}
+p(\text{no disease | negative test}) &=& \frac{p(\text{negative test | no disease}) * p(\text{no disease})}{p(\text{negative test})} \\
+  &=& \frac{0.99 * (1-0.2)}{p(\text{negative test | disease}) * p(\text{disease}) + p(\text{negative test | no disease}) * p(\text{no disease})} \\
+  &=& \frac{0.99 * (1-0.2)}{(1 - p(\text{positive test | disease})) * p(\text{disease}) + 0.99 * 0.8} \\
+  &=& \frac{0.99 * (1-0.2)}{(1 - 1) * 0.2 + 0.99 * 0.8} \\
+  &=& 1
+\end{eqnarray}
+
+With the final question being the complement of the last, ie p(disease | negative test) = 1 - p(no disease | negative test) = 0.2
+
+Summarizing:
+
++ given a positive test, what is the probability I am actaully positive?  `r round((1*0.2)/(1*0.2+0.1*0.8),2)`
++ given a positive test, what is the probability I am actaully negative?  `r round(1 - (1*0.2)/(1*0.2+0.1*0.8),2)`
++ given a negative test, what is the probability I am actaully negative?  1
++ given a negative test, what is the probability I am actaully positive?  0
+
+
+
+
+
+
+
+

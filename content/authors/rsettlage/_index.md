@@ -42,7 +42,7 @@ education:
 social:
 - icon: envelope
   icon_pack: fas
-  link: '#contact'  # For a direct email link, use "mailto:test@example.org".
+  link: '#contact'  # For a direct email link, use "mailto:rsettlag@vt.edu".
 - icon: google-scholar
   icon_pack: ai
   link: https://scholar.google.com/citations?user=Q_fpZUgAAAAJ&hl=en
@@ -69,4 +69,4 @@ email: "bobsettlage@gmail.com"
 user_groups: []
 ---
 
-Bob Settlage is a Computational and Data Scientist within Advanced Research Computing (ARC) at Virginia Tech. ARC is a VT community resource to assist faculty in using high performance computing (HPC) at VT. This role combines two of his passions, computing and data and allows him to bring his expertise in both to faculty across the VT campus. Prior to VT, Bob worked at Merck &amp; Co. where he was able to combine his interests in computing with knowledge of mass spectrometry and protein sequencing to oversee efforts in creating end-to-end analysis pipelines that included novel computational interfaces allowing scientists to quickly analyze, view and curate massive amounts of Proteomics data ([Elucidator by Rosetta BioSoft](https://www.g6g-softwaredirectory.com/bio/proteomics/mass-spec/20086RosettaElucidatorSystem.php)). He is currently working to lower the barrier to entry in HPC ([Open OnDemand](http://openondemand.org/)) and is looking for opportunities to create HPC portals.
+Bob Settlage is a Computational and Data Scientist within [Advanced Research Computing](www.arc.vt.edu) (ARC) at Virginia Tech. ARC is a VT community resource to assist faculty in using high performance computing (HPC) at VT. This role combines two of his passions, computing and data and allows him to bring his expertise in both to faculty across the VT campus. Prior to VT, Bob worked at Merck &amp; Co. where he was able to combine his interests in computing with knowledge of mass spectrometry and protein sequencing to oversee efforts in creating end-to-end analysis pipelines that included novel computational interfaces allowing scientists to quickly analyze, view and curate massive amounts of Proteomics data ([Elucidator by Rosetta BioSoft](https://www.g6g-softwaredirectory.com/bio/proteomics/mass-spec/20086RosettaElucidatorSystem.php)). He is currently working to lower the barrier to entry in HPC ([Open OnDemand](http://openondemand.org/)) and is looking for opportunities to create HPC portals.
